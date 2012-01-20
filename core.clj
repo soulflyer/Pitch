@@ -51,14 +51,21 @@
 
 (defn fold-note
   "Folds note intervals into a 2 octave range so that chords using notes
-  spread across multiple octaves can be correctly recognised.
-
-  TODO: rewrite with recur?"
+  spread across multiple octaves can be correctly recognised."
 
   [note]
   (if (or (< 21 note) (contains? #{20 19 16 12} note))
     (fold-note (- note 12))
      note ))
+
+;; (defn simplify-chord
+;;   "expects notes to contain 0 (the root note) Reduces all notes into 2 octaves. This will allow
+;;   identification of fancy jazz chords, but will miss some simple chords if they are spread over
+;;   more than 1 octave."
+
+;;   [notes]
+;;   {:notes (set (map (fn [x] (fold-note x)) notes))
+;;    :name (find-chord-name (set (map (fn [x] (fold-note x)) notes)))})
 
 (defn simplify-chord
   "expects notes to contain 0 (the root note) Reduces all notes into 2 octaves. This will allow
@@ -66,26 +73,39 @@
   more than 1 octave."
 
   [notes]
-  {:notes (set (map (fn [x] (fold-note x)) notes))
-   :name (find-chord-name (set (map (fn [x] (fold-note x)) notes)))})
+  (set (map (fn [x] (fold-note x)) notes)))
+
+;; (defn compress-chord
+;;   "expects notes to contain 0 (the root note) Reduces all notes into 1 octave. This will lose
+;;   all the fancy jazz chords but recognise sparse multiple octave smple chords"
+
+;;   [notes]
+;;   {:notes (set (map (fn [x] (mod x 12)) notes))
+;;    :name (find-chord-name (set (map (fn [x] (mod x 12)) notes)))})
 
 (defn compress-chord
   "expects notes to contain 0 (the root note) Reduces all notes into 1 octave. This will lose
   all the fancy jazz chords but recognise sparse multiple octave smple chords"
 
   [notes]
-  {:notes (set (map (fn [x] (mod x 12)) notes))
-   :name (find-chord-name (set (map (fn [x] (mod x 12)) notes)))})
+  (set (map (fn [x] (mod x 12)) notes)))
+
+(defn deinvert-chord
+  "rearranges notes so that the new-root th entry in notes becomes the root"
+
+  [notes new-root]
+  {}
+  )
 
 ;; (defn find-chord
 ;;   "Assumes the root note is the lowest note in notes"
-
 ;;   [notes]
-;;   (let [root (first (sort notes))
-;;         adjusted-notes (set (map (fn [x] (- x root)) notes ))]
-;;     {:root (find-note-name (mod root 12))
-;;      :chord-type (or (:name (simplify-chord adjusted-notes))
-;;                      (:name (compress-chord adjusted-notes)))}))
+;;   (if (< 0 (count notes))
+;;     (let [root (first (sort notes))
+;;           adjusted-notes (set (map (fn [x] (- x root)) notes ))]
+;;       {:root (find-note-name (mod root 12))
+;;        :chord-type (or (:name (simplify-chord adjusted-notes))
+;;                        (:name (compress-chord adjusted-notes)))})))
 
 (defn find-chord
   "Assumes the root note is the lowest note in notes"
@@ -94,59 +114,6 @@
     (let [root (first (sort notes))
           adjusted-notes (set (map (fn [x] (- x root)) notes ))]
       {:root (find-note-name (mod root 12))
-       :chord-type (or (:name (simplify-chord adjusted-notes))
-                       (:name (compress-chord adjusted-notes)))})))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+       :chord-type (or (find-chord-name (simplify-chord adjusted-notes))
+                       (find-chord-name (compress-chord adjusted-notes)))})))
 

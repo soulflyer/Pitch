@@ -23,13 +23,6 @@
 
 (def kb (midi-in "nanoKEY"))
 
-;; (defn midi-player [event ts]
-;;   (beep (:note event)))
-
-(definst blah
-  [poll-rate 2]
-  (poll (impulse:kr poll-rate)  0  (str (find-chord @current-notes))))
-
 (defn midi-player [event ts]
   (do (info event)
       (cond
@@ -37,7 +30,11 @@
        (do (beep (:note event))
            (add-to-current-notes (:note event)))
        (= :note-off (:cmd event))
-       (remove-from-current-notes (:note event)))))
+       (remove-from-current-notes (:note event)))
+      (info "chord "
+            (:root(find-chord @current-notes))
+            " "
+            (:chord-type (find-chord @current-notes)))))
 
 (midi-handle-events kb #'midi-player)
 
