@@ -29,11 +29,12 @@
   [scale]
   (find-name scale SCALE))
 
-(defn find-chord-name
+(defn find-normalised-chord-name
   "Return the name of the first matching chord in CHORD
   or nil if not found
+  chord must contain 0
 
-  ie: (find-chord-name #{0 3 7}
+  ie: (find-normalised-chord-name #{0 3 7}
   :minor"
 
   [chord]
@@ -47,7 +48,7 @@
   :D#"
 
   [note]
-  (find-name note NOTES))
+  (find-name (mod note 12) NOTES))
 
 (defn fold-note
   "Folds note intervals into a 2 octave range so that chords using notes
@@ -73,20 +74,36 @@
   [notes]
   (set (map (fn [x] (mod x 12)) notes)))
 
-(defn deinvert-chord
-  "rearranges notes so that the new-root th entry in notes becomes the root"
+(defn select-root
+  "Adds a new root note below the lowest note present in notes"
+  [notes root-index]
+  (let [new-root (nth (seq (sort notes)) root-index)
+        lowest-note (first (sort notes))
+        octaves (+ 1 (quot (- new-root lowest-note) 12))]
+    #{(cons (- new-root (* octaves 12)) notes)}))
 
-  [notes new-root]
-  {}
-  )
+;; (defn find-chord
+;;   "Assumes the root note is the lowest note in notes"
+;;   [notes]
+;;   (if (< 0 (count notes))
+;;     (let [root (first (sort notes))
+;;           adjusted-notes (set (map (fn [x] (- x root)) notes ))]
+;;       {:root (find-note-name (mod root 12))
+;;        :chord-type (or (find-normalised-chord-name (simplify-chord adjusted-notes))
+;;                        (find-normalised-chord-name (compress-chord adjusted-notes)))})))
 
-(defn find-chord
-  "Assumes the root note is the lowest note in notes"
+(defn find-chord-with-low-root
+  "Finds the chord represented by notes
+   Assumes the root note is the lowest note in notes
+   notes can be spread over multiple octaves"
+
   [notes]
   (if (< 0 (count notes))
     (let [root (first (sort notes))
           adjusted-notes (set (map (fn [x] (- x root)) notes ))]
-      {:root (find-note-name (mod root 12))
-       :chord-type (or (find-chord-name (simplify-chord adjusted-notes))
-                       (find-chord-name (compress-chord adjusted-notes)))})))
+      (or (find-normalised-chord-name (simplify-chord adjusted-notes))
+          (find-normalised-chord-name (compress-chord adjusted-notes))))))
 
+(defn find-chord
+  [notes]
+  (or (find-chord-with-low-root notes)))
