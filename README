@@ -1,1 +1,14 @@
-Identify chords played
+Find Chord
+----------
+
+find-chord will identify chords from a set of midi notes. To see it in action compile test.clj
+You will probably need to modify it to read notes from your keyboard.
+Change this line :
+
+(def kb (midi-in "nanoKEY"))
+
+to match your keyboard type. You can find the necessary changes by typing (midi-in) in the repl.
+
+There is a shell script included that gives a continuous output of the chords being played. Run this command (from the source directory)
+
+tail -f  ~/.overtone/log/log.log  | ./output.sh
