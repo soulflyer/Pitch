@@ -29,7 +29,7 @@
   [scale]
   (find-name scale SCALE))
 
-(defn find-normalised-chord-name
+(defn- find-normalised-chord-name
   "Return the name of the first matching chord in CHORD
   or nil if not found
   chord must contain 0
@@ -50,7 +50,7 @@
   [note]
   (find-name (mod note 12) NOTES))
 
-(defn fold-note
+(defn- fold-note
   "Folds note intervals into a 2 octave range so that chords using notes
   spread across multiple octaves can be correctly recognised."
 
@@ -59,7 +59,7 @@
     (fold-note (- note 12))
      note ))
 
-(defn simplify-chord
+(defn- simplify-chord
   "expects notes to contain 0 (the root note) Reduces all notes into 2 octaves. This will allow
   identification of fancy jazz chords, but will miss some simple chords if they are spread over
   more than 1 octave."
@@ -67,20 +67,22 @@
   [notes]
   (set (map (fn [x] (fold-note x)) notes)))
 
-(defn compress-chord
+(defn- compress-chord
   "expects notes to contain 0 (the root note) Reduces all notes into 1 octave. This will lose
   all the fancy jazz chords but recognise sparse multiple octave smple chords"
 
   [notes]
   (set (map (fn [x] (mod x 12)) notes)))
 
-(defn select-root
+(defn- select-root
   "Adds a new root note below the lowest note present in notes"
   [notes root-index]
-  (let [new-root (nth (seq (sort notes)) root-index)
-        lowest-note (first (sort notes))
-        octaves (+ 1 (quot (- new-root lowest-note) 12))]
-    #{(cons (- new-root (* octaves 12)) notes)}))
+  (if (< 0 root-index)
+    (let [new-root (nth (seq (sort notes)) root-index)
+         lowest-note (first (sort notes))
+         octaves (+ 1 (quot (- new-root lowest-note) 12))]
+      (set (cons (- new-root (* octaves 12)) notes)))
+    notes))
 
 ;; (defn find-chord
 ;;   "Assumes the root note is the lowest note in notes"
@@ -92,7 +94,7 @@
 ;;        :chord-type (or (find-normalised-chord-name (simplify-chord adjusted-notes))
 ;;                        (find-normalised-chord-name (compress-chord adjusted-notes)))})))
 
-(defn find-chord-with-low-root
+(defn- find-chord-with-low-root
   "Finds the chord represented by notes
    Assumes the root note is the lowest note in notes
    notes can be spread over multiple octaves"
@@ -106,4 +108,72 @@
 
 (defn find-chord
   [notes]
-  (or (find-chord-with-low-root notes)))
+  (loop [note 0]
+    (if (< note (count notes) )
+      (let [mod-notes (select-root notes note)
+            chord  (find-chord-with-low-root mod-notes)
+            root (find-note-name (first (sort mod-notes)))]
+       (if chord
+         {:root root :chord-type chord}
+         (recur (inc note))))
+      nil)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

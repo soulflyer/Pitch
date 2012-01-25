@@ -32,9 +32,7 @@
        (= :note-off (:cmd event))
        (remove-from-current-notes (:note event)))
       (info "chord "
-            (mod (first (sort @current-notes))12)
-            " "
-            (find-chord-with-low-root @current-notes))))
+            (find-chord @current-notes))))
 
 (midi-handle-events kb #'midi-player)
 
