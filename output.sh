@@ -5,6 +5,5 @@
 while read data; do
     clear
     echo Chord
-#    echo "$data" | sed -n 's/INFO: chord//p' | sed 's/://g'
     echo "$data" | sed -n 's/INFO: chord {:root :\([A-Za-z][bB#]*\), :chord-type :\([a-zA-Z0-9][a-zA-Z0-9]*\)}/\1 \2/p'
 done

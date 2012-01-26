@@ -1,7 +1,6 @@
 (ns pitch.test
   (:use [overtone.live]
         [overtone.util.log]
-        [overtone.gui.info]
         [pitch.core]))
 
 (definst beep [note 60]

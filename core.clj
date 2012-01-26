@@ -29,26 +29,21 @@
   [scale]
   (find-name scale SCALE))
 
-(defn- find-normalised-chord-name
-  "Return the name of the first matching chord in CHORD
-  or nil if not found
-  chord must contain 0
+;; (defn- find-normalised-chord-name
+;;   "Return the name of the first matching chord in CHORD
+;;   or nil if not found
+;;   chord must contain 0
 
-  ie: (find-normalised-chord-name #{0 3 7}
-  :minor"
+;;   ie: (find-normalised-chord-name #{0 3 7}
+;;   :minor"
 
-  [chord]
-  (find-name chord CHORD))
+;;   [chord]
+;;   (find-name chord CHORD))
 
 (defn find-note-name
-  "Return name of the first matching note in NOTES
-  or nil if not found
-
-  ie: (find-note-name 3)
-  :D#"
 
   [note]
-  (find-name (mod note 12) NOTES))
+  (REVERSE-NOTES (mod note 12)))
 
 (defn- fold-note
   "Folds note intervals into a 2 octave range so that chords using notes
@@ -84,16 +79,6 @@
       (set (cons (- new-root (* octaves 12)) notes)))
     notes))
 
-;; (defn find-chord
-;;   "Assumes the root note is the lowest note in notes"
-;;   [notes]
-;;   (if (< 0 (count notes))
-;;     (let [root (first (sort notes))
-;;           adjusted-notes (set (map (fn [x] (- x root)) notes ))]
-;;       {:root (find-note-name (mod root 12))
-;;        :chord-type (or (find-normalised-chord-name (simplify-chord adjusted-notes))
-;;                        (find-normalised-chord-name (compress-chord adjusted-notes)))})))
-
 (defn- find-chord-with-low-root
   "Finds the chord represented by notes
    Assumes the root note is the lowest note in notes
@@ -103,8 +88,8 @@
   (if (< 0 (count notes))
     (let [root (first (sort notes))
           adjusted-notes (set (map (fn [x] (- x root)) notes ))]
-      (or (find-normalised-chord-name (simplify-chord adjusted-notes))
-          (find-normalised-chord-name (compress-chord adjusted-notes))))))
+      (or (find-name (simplify-chord adjusted-notes) CHORD)
+          (find-name (compress-chord adjusted-notes) CHORD)))))
 
 (defn find-chord
   [notes]
