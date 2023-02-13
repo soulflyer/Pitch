@@ -1,1 +1,4 @@
 .clj-kondo
+.nrepl-port
+native
+target
