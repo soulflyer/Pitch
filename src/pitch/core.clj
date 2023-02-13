@@ -1,11 +1,13 @@
 (ns pitch.core
-  (:use [overtone.live]))
+  (:require [overtone.core :refer [SCALE REVERSE-NOTES CHORD]]))
 
 (defn list-defined-scales
   []
   (doseq [keyval SCALE]
     (prn (key keyval)
          (val keyval))))
+
+(comment (list-defined-scales))
 
 (def testscale [2 2 2 1 2 2 1])
 
